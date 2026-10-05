@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM - Publier et Partager des Contenus en Ligne</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --card-hover: #262626;
+            --text-color: #E0E0E0;
+            --text-muted: #9E9E9E;
+            --accent-color: #DEFF9A;
+            --accent-hover: #c9f578;
+            --correct-color: #4EAE67;
+            --correct-bg: rgba(78, 174, 103, 0.15);
+            --wrong-color: #FF6B6B;
+            --wrong-bg: rgba(255, 107, 107, 0.15);
+            --border-color: #2F2F2F;
+            --border-radius: 14px;
+            --font-stack: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .quiz-wrapper {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 780px;
+            padding: 28px;
+            position: relative;
+        }
+
+        /* En-tête */
+        .quiz-header {
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(222, 255, 154, 0.12);
+            color: var(--accent-color);
+            border: 1px solid rgba(222, 255, 154, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-pill {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: #121212;
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.55rem;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        /* Progression */
+        .progress-section {
+            margin-top: 14px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: #121212;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #A8E85A, var(--accent-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        /* Questions */
+        .question-card {
+            margin: 20px 0;
+        }
+
+        .question-number {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 1.18rem;
+            color: #FFFFFF;
+            font-weight: 600;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        /* Réponses */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-button {
+            background-color: #232323;
+            border: 1.5px solid #333333;
+            border-radius: 10px;
+            color: var(--text-color);
+            padding: 14px 16px;
+            font-size: 0.98rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-family: inherit;
+        }
+
+        .option-button:hover:not(:disabled) {
+            background-color: var(--card-hover);
+            border-color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .option-button:disabled {
+            cursor: default;
+        }
+
+        .option-button.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-color);
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .option-button.correct::after {
+            content: "✓";
+            color: var(--correct-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-color);
+            color: #FFFFFF;
+        }
+
+        .option-button.wrong::after {
+            content: "✕";
+            color: var(--wrong-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.dimmed {
+            opacity: 0.45;
+        }
+
+        /* Feedback */
+        .feedback-container {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .feedback-container.correct {
+            background-color: var(--correct-bg);
+            border-left: 4px solid var(--correct-color);
+        }
+
+        .feedback-container.wrong {
+            background-color: var(--wrong-bg);
+            border-left: 4px solid var(--wrong-color);
+        }
+
+        .feedback-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .feedback-container.correct .feedback-title {
+            color: var(--correct-color);
+        }
+
+        .feedback-container.wrong .feedback-title {
+            color: var(--wrong-color);
+        }
+
+        .feedback-text {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            line-height: 1.45;
+        }
+
+        /* Actions */
+        .actions-row {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            background-color: var(--accent-color);
+            color: #121212;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(222, 255, 154, 0.25);
+        }
+
+        .btn-action:disabled {
+            background-color: #2D2D2D;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Écran des résultats */
+        .results-view {
+            text-align: center;
+            padding: 10px 0;
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .score-circle-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            background: #171717;
+            border: 4px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 24px rgba(222, 255, 154, 0.15);
+        }
+
+        .score-val {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+
+        .score-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .results-view h2 {
+            font-size: 1.5rem;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            font-size: 0.98rem;
+            color: var(--text-color);
+            max-width: 580px;
+            margin: 0 auto 24px auto;
+            line-height: 1.5;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 360px;
+            margin: 0 auto 24px auto;
+        }
+
+        .stat-box {
+            background-color: #151515;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .stat-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stat-num.succ { color: var(--correct-color); }
+        .stat-num.err { color: var(--wrong-color); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .quiz-wrapper {
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .question-title {
+                font-size: 1.05rem;
+            }
+            .option-button {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+            .score-circle-wrapper {
+                width: 130px;
+                height: 130px;
+            }
+            .score-val {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-wrapper">
+        <div id="quiz-view">
+            <div class="quiz-header">
+                <div class="header-top">
+                    <span class="tag-badge">🛡️ Permis Web &amp; Publication</span>
+                    <span class="score-pill" id="live-score">Score : 0 / 40</span>
+                </div>
+                <h1>Publier et Partager des Contenus en Ligne</h1>
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Progression</span>
+                        <span id="progress-text">Question 1 sur 40</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-number" id="question-index-label">Question 1</div>
+                <div class="question-title" id="question-text">Chargement de la question...</div>
+                <div class="options-list" id="options-container"></div>
+            </div>
+
+            <div class="feedback-container" id="feedback-box">
+                <div class="feedback-title" id="feedback-title">Bonne réponse !</div>
+                <div class="feedback-text" id="feedback-desc">Explication pédagogique...</div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-action" id="next-btn" disabled>Question suivante ➔</button>
+            </div>
+        </div>
+
+        <div class="results-view" id="results-view">
+            <span class="tag-badge" style="margin-bottom: 14px;">Permis Web &amp; Certification PIX</span>
+            
+            <div class="score-circle-wrapper">
+                <div class="score-val" id="final-percent">0%</div>
+                <div class="score-sub">Score Final</div>
+            </div>
+
+            <h2 id="result-title-text">Résultat de la Mission</h2>
+            <p class="result-description" id="result-desc-text">Commentaire d'évaluation...</p>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-num succ" id="stat-correct-count">0</div>
+                    <div class="stat-label">Réponses correctes</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num err" id="stat-wrong-count">0</div>
+                    <div class="stat-label">Erreurs / Pièges</div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="restartQuiz()">🔄 Recommencer l'évaluation</button>
+        </div>
+    </div>
+
+    <script>
+        const rawQuestions = [
+            // Slide 2 : La Carte de la Mission Numérique (5 Niveaux)
+            {
+                q: "Combien d'étapes / niveaux composent la « Carte de ta Mission Numérique » menant à la validation PIX ?",
+                options: [
+                    "5 niveaux (Le Terrain, Moi, Les Autres, L'Esprit Critique, Le Vivre-Ensemble)",
+                    "3 niveaux (Écrire, Cliquer, Partager)",
+                    "10 niveaux obligatoires",
+                    "2 niveaux (Privé et Public)"
+                ],
+                answer: 0,
+                feedback: "La carte comprend 5 niveaux clés : 1. Le Terrain, 2. Moi, 3. Les Autres, 4. L'Esprit Critique, et 5. Le Vivre-Ensemble."
+            },
+            {
+                q: "Dans la Carte de la Mission Numérique, à quoi correspond le niveau « 3. Les Autres » ?",
+                options: [
+                    "Au respect du droit d'auteur et des créations d'autrui",
+                    "À l'apprentissage des jeux vidéo multijoueurs",
+                    "À l'achat d'un nouveau smartphone",
+                    "À la suppression de ses comptes sur les réseaux"
+                ],
+                answer: 0,
+                feedback: "Le niveau 3 est dédié au respect des créations des autres et aux règles du droit d'auteur."
+            },
+            {
+                q: "Dans la Carte de la Mission Numérique, quel sujet est abordé au niveau « 4. L'Esprit Critique » ?",
+                options: [
+                    "Distinguer la vraie information des fausses nouvelles (Info ou Intox)",
+                    "Apprendre à taper plus vite sur son clavier",
+                    "Changer l'apparence de son navigateur web",
+                    "Réparer un écran d'ordinateur cassé"
+                ],
+                answer: 0,
+                feedback: "Le niveau 4 entraîne à développer son esprit critique face aux pièges et rumeurs en ligne (Info ou Intox)."
+            },
+
+            // Slide 3 : La Règle d'Or du Web : L'Encre Indélébile
+            {
+                q: "Que stipule « La Règle d'Or du Web : L'Encre Indélébile » ?",
+                options: [
+                    "Dès qu'une information est publiée sur le web, elle devient très difficile à effacer",
+                    "Tout ce qu'on écrit sur Internet s'efface automatiquement après 24 heures",
+                    "Il faut utiliser une imprimante couleur spéciale pour publier en ligne",
+                    "Les textes numériques sont toujours temporaires et sans danger"
+                ],
+                answer: 0,
+                feedback: "Comme de l'encre indélébile, une information mise en ligne peut être copiée, enregistrée ou archivée, rendant sa suppression quasi impossible."
+            },
+            {
+                q: "Pourquoi dit-on qu'une publication sur Internet est comparable à de l'encre indélébile ?",
+                options: [
+                    "Parce que d'autres personnes ont pu la télécharger, la capturer ou la repartager",
+                    "Parce que les serveurs informatiques ne s'éteignent jamais",
+                    "Parce que le clavier écrit avec une encre chimique",
+                    "Parce que les professeurs ont une copie de tout le Web"
+                ],
+                answer: 0,
+                feedback: "Même si tu supprimes un message ou une photo, quelqu'un a pu faire une capture d'écran ou l'enregistrer au préalable."
+            },
+
+            // Slide 4 : Savoir où l'on marche : Privé vs Public
+            {
+                q: "Qu'est-ce qu'un « Espace Privé » sur Internet ?",
+                options: [
+                    "Un espace où tu échanges directement avec une seule personne ou un petit groupe d'amis proches",
+                    "Un site web accessible à tous les habitants de la Terre",
+                    "Une chaîne YouTube suivie par des milliers d'inconnus",
+                    "Le panneau d'affichage à l'entrée du collège"
+                ],
+                answer: 0,
+                feedback: "L'espace privé est restreint : seuls les membres explicitement invités ou autorisés ont accès aux échanges."
+            },
+            {
+                q: "Qui a accès aux publications postées dans un « Espace Public » ?",
+                options: [
+                    "Tout le monde (inconnus, professeurs, futurs employeurs, adultes)",
+                    "Uniquement ton meilleur ami",
+                    "Seulement les élèves de ta classe",
+                    "Personne, c'est un espace verrouillé"
+                ],
+                answer: 0,
+                feedback: "Dans un espace public, n'importe quel internaute peut voir, lire, copier ou partager ce que tu publies."
+            },
+            {
+                q: "Quelle image symbolise l'Espace Public dans le cours ?",
+                options: [
+                    "Le mégaphone (diffusion à la foule)",
+                    "Le cadenas fermé",
+                    "La clé USB bleue",
+                    "La boîte aux lettres privée"
+                ],
+                answer: 0,
+                feedback: "L'espace public est symbolisé par un mégaphone : ce que tu dis résonne devant tout le monde."
+            },
+
+            // Slide 5 : La Cartographie du Web (Où peut-on publier ?)
+            {
+                q: "Parmi ces propositions, laquelle fait partie des espaces de publication liés à « L'ENT et le Collège » ?",
+                options: [
+                    "Le blog de classe, le cahier de texte ou l'espace de dépôt des devoirs",
+                    "Les vidéos courtes sur TikTok",
+                    "Les forums de discussion anonymes de jeux vidéo",
+                    "Un blog de voyage personnel ouvert à tous"
+                ],
+                answer: 0,
+                feedback: "L'ENT regroupe les outils officiels du collège sécurisés pour l'apprentissage et le rendu des devoirs."
+            },
+            {
+                q: "À quel âge minimum l'accès aux réseaux sociaux grand public est-il généralement soumis ?",
+                options: [
+                    "13 ans",
+                    "6 ans",
+                    "18 ans uniquement",
+                    "Il n'y a aucun âge minimum légal"
+                ],
+                answer: 0,
+                feedback: "La plupart des grandes plateformes et réseaux sociaux fixent un âge légal minimum de 13 ans pour la création de compte."
+            },
+            {
+                q: "Que sont les « Forums et Commentaires » dans la cartographie du Web ?",
+                options: [
+                    "Des espaces de discussion sous un article, une vidéo ou un jeu en ligne pour donner son avis",
+                    "Des logiciels pour créer des formules de tableur",
+                    "Des serveurs fermés réservés aux ingénieurs",
+                    "Des disques durs externes de stockage"
+                ],
+                answer: 0,
+                feedback: "Ce sont des espaces interactifs où chaque internaute peut réagir et partager une opinion sous un contenu."
+            },
+
+            // Slide 6 : S'exprimer avec Respect : Tes Droits et tes Devoirs
+            {
+                q: "Quel est ton DROIT quand tu publies tes créations personnelles (dessins, textes, exposés) ?",
+                options: [
+                    "Partager ses productions et montrer ce que l'on sait faire pour se valoriser",
+                    "Copier le travail d'un camarade et prétendre l'avoir fait soi-même",
+                    "Interdire aux professeurs de corriger le devoir",
+                    "Insulter ceux qui n'aiment pas ton dessin"
+                ],
+                answer: 0,
+                feedback: "Partager ses réalisations est un droit enrichissant et gratifiant qui permet d'exprimer sa créativité."
+            },
+            {
+                q: "Quel est ton DEVOIR lorsque tu n'es pas d'accord avec quelqu'un en ligne ?",
+                options: [
+                    "Exprimer son opinion calmement, sans insultes ni moqueries (bienveillance obligatoire)",
+                    "L'attaquer publiquement en écrivant en lettres capitales",
+                    "Créer un groupe de moquerie avec ses camarades",
+                    "Lui envoyer des messages menaçants"
+                ],
+                answer: 0,
+                feedback: "La liberté d'expression s'accompagne d'un devoir strict de respect et de bienveillance : aucune injure n'est tolérée."
+            },
+
+            // Slide 7 : Attention à ton Empreinte Numérique !
+            {
+                q: "Qu'est-ce que « L'Empreinte Numérique » selon le cours ?",
+                options: [
+                    "La trace laissée par chaque photo, vidéo ou commentaire créant ta « réputation numérique »",
+                    "La marque laissée par ton doigt sur l'écran tactile de la tablette",
+                    "Le mot de passe secret pour déverrouiller son smartphone",
+                    "Le modèle de la carte graphique de ton ordinateur"
+                ],
+                answer: 0,
+                feedback: "L'empreinte numérique est l'ensemble des traces que tu laisses sur le Web et qui construisent ton e-réputation au fil du temps."
+            },
+            {
+                q: "Quelle phrase résume l'impact de l'empreinte numérique au quotidien ?",
+                options: [
+                    "« Ce que tu postes te suit ! »",
+                    "« Tout disparaît dès qu'on éteint l'écran ! »",
+                    "« Internet oublie tout en 10 minutes ! »",
+                    "« Les vidéos ne laissent aucune trace ! »"
+                ],
+                answer: 0,
+                feedback: "« Ce que tu postes te suit » : les publications passées peuvent ressurgir bien des années plus tard."
+            },
+
+            // Slide 8 : Checklist de Sécurité : Protéger ta vie privée
+            {
+                q: "Parmi les informations suivantes, lesquelles font partie des Données Personnelles à NE JAMAIS publier en ligne ?",
+                options: [
+                    "Ton nom de famille, ton adresse postale, ton numéro de téléphone et le nom de ton collège",
+                    "Ton animal imaginaire préféré",
+                    "Ta couleur favorite",
+                    "Le titre de ton livre de fiction préféré"
+                ],
+                answer: 0,
+                feedback: "Les données personnelles permettant de t'identifier ou de te localiser physiquement doivent rester secrètes."
+            },
+            {
+                q: "Que doit-on OBLIGATOIREMENT faire avant de poster la photo d'un camarade sur Internet (Droit à l'Image) ?",
+                options: [
+                    "Demander toujours son accord préalable",
+                    "Modifier les couleurs de la photo avec un filtre rigolo",
+                    "Publier la photo le soir après les cours",
+                    "Ajouter une légende sans son prénom"
+                ],
+                answer: 0,
+                feedback: "Chaque personne possède un droit exclusif sur son image : publier une photo sans consentement est illégal."
+            },
+
+            // Slide 9 : Les 3 Règles du Partage
+            {
+                q: "Quelles sont les « 3 Règles du Partage » à respecter avant de relayer un contenu tiers ?",
+                options: [
+                    "1. Vérifier ➔ 2. Demander ➔ 3. Citer l'Auteur",
+                    "1. Copier ➔ 2. Coller ➔ 3. Supprimer",
+                    "1. Liker ➔ 2. Partager ➔ 3. Éteindre",
+                    "1. Télécharger ➔ 2. Modifier ➔ 3. Vendre"
+                ],
+                answer: 0,
+                feedback: "Les 3 règles indispensables : Vérifier l'exactitude de l'info, Demander l'accord de l'auteur et Citer clairement son nom."
+            },
+            {
+                q: "Que signifie la règle n°1 du partage : « VÉRIFIER » ?",
+                options: [
+                    "Ne pas partager une info sans s'assurer qu'elle est exacte et ne cherche pas à tromper",
+                    "Vérifier si le fichier pèse moins de 1 mégaoctet",
+                    "Regarder si la photo est au format carré",
+                    "Compter le nombre de likes sur la publication originale"
+                ],
+                answer: 0,
+                feedback: "On ne relaie jamais une information sans s'être d'abord assuré de sa véracité."
+            },
+            {
+                q: "Que signifie la règle n°2 du partage : « DEMANDER » ?",
+                options: [
+                    "S'assurer d'avoir l'autorisation du créateur avant de repartager son dessin, texte ou photo",
+                    "Demander de l'argent à ses abonnés",
+                    "Demander à son ami d'aimer la publication",
+                    "Demander un nouveau mot de passe à l'administrateur"
+                ],
+                answer: 0,
+                feedback: "L'auteur original doit donner son accord explicite pour toute rediffusion de sa création."
+            },
+            {
+                q: "Que signifie la règle n°3 du partage : « CITER L'AUTEUR » ?",
+                options: [
+                    "Indiquer toujours le nom du créateur de l'œuvre que l'on réutilise",
+                    "Écrire le prénom de son professeur sous l'image",
+                    "Inventer un nom d'artiste imaginaire",
+                    "Écrire 'Trouvé sur Google' sans préciser le créateur"
+                ],
+                answer: 0,
+                feedback: "Citer l'auteur permet de reconnaître la propriété intellectuelle de celui qui a conçu l'œuvre."
+            },
+
+            // Slide 10 : Alerte Plagiat ! Respecter le Droit d'Auteur
+            {
+                q: "Quelle proportion des créations originales en ligne est protégée par le Droit d'Auteur ?",
+                options: [
+                    "100% des créations sont protégées",
+                    "Seulement 10% des œuvres payantes",
+                    "50% des vidéos YouTube",
+                    "Aucune création n'est protégée sur Internet"
+                ],
+                answer: 0,
+                feedback: "Sur Internet, 100% des créations (textes, images, sons, vidéos) sont protégées par le droit d'auteur dès leur réalisation."
+            },
+            {
+                q: "Qu'est-ce que le « Plagiat » ?",
+                options: [
+                    "Faire du copier-coller d'un texte ou d'une œuvre sans mentionner sa source et son auteur",
+                    "Prendre une photo de son propre dessin avec son téléphone",
+                    "Rédiger un devoir avec ses propres phrases et explications",
+                    "Faire une recherche sur un moteur sécurisé comme Qwant Junior"
+                ],
+                answer: 0,
+                feedback: "Le plagiat consiste à s'attribuer indûment le travail intellectuel ou artistique d'autrui."
+            },
+            {
+                q: "Est-ce que tout ce qui est accessible gratuitement sur Internet est libre d'utilisation ?",
+                options: [
+                    "Non ! Tout ce qui est visible n'est pas gratuit ni libre de droits",
+                    "Oui, car tout ce qui est sur le Web appartient à tout le monde",
+                    "Oui, si on effectue la recherche sur son téléphone",
+                    "Oui, à condition de ne pas se faire repérer"
+                ],
+                answer: 0,
+                feedback: "La gratuité d'accès visuel ne signifie aucunement que l'on dispose des droits d'exploitation ou de réutilisation."
+            },
+
+            // Slide 11 : La Boîte à Outils : Trouver des images légales
+            {
+                q: "Pour illustrer un exposé au collège en toute légalité, quel type d'images faut-il privilégier ?",
+                options: [
+                    "Des images « libres de droits » tout en citant leur source",
+                    "Les premières photos privées trouvées sur les réseaux sociaux",
+                    "Des captures d'écran de films payants au cinéma",
+                    "N'importe quelle photo sans en mentionner l'origine"
+                ],
+                answer: 0,
+                feedback: "On utilise des banques d'images libres de droits autorisant la réutilisation pédagogique."
+            },
+            {
+                q: "Parmi les plateformes suivantes, lesquelles sont des exemples de banques d'images libres citées dans le cours ?",
+                options: [
+                    "Wikimedia Commons ou Pixabay",
+                    "TikTok et Snapchat",
+                    "La messagerie de l'ENT et Pronote",
+                    "Le jeu vidéo Fortnite"
+                ],
+                answer: 0,
+                feedback: "Wikimedia Commons et Pixabay mettent à disposition des images sous licences libres réutilisables en citant l'auteur."
+            },
+
+            // Slide 12 : Info ou Intox en Ligne ? Active ton Radar à Pièges
+            {
+                q: "Qu'est-ce que le « Clickbait » (Piège n°1 du radar) ?",
+                options: [
+                    "Des titres exagérés et racoleurs qui cherchent juste à attirer des vues avec des histoires fausses ou choquantes",
+                    "Un logiciel antivirus très puissant",
+                    "Une touche du clavier d'ordinateur",
+                    "Un bouton pour valider son devoir sur l'ENT"
+                ],
+                answer: 0,
+                feedback: "Le piège à clics (clickbait) manipule la curiosité ou la peur des internautes pour générer du trafic publicitaire."
+            },
+            {
+                q: "Par quels moyens une image peut-elle être truquée en ligne (Piège n°2) ?",
+                options: [
+                    "Elle peut être retouchée, sortie de son contexte d'origine ou générée par une Intelligence Artificielle (IA)",
+                    "Elle est obligatoirement transformée en texte Word",
+                    "Elle est scannée à l'envers",
+                    "Elle s'affiche uniquement en noir et blanc"
+                ],
+                answer: 0,
+                feedback: "Retouches graphiques, anachronismes de contexte ou génération par IA sont des sources fréquentes de trucages visuels."
+            },
+
+            // Slide 13 : Le Réflexe du Détective : Recouper les sources
+            {
+                q: "En quoi consiste « Le Réflexe du Détective » pour vérifier une information ?",
+                options: [
+                    "Vérifier si un grand journal reconnu ou un site officiel confirme l'information avant d'y croire",
+                    "Partager immédiatement la nouvelle à 20 amis pour leur demander leur avis",
+                    "Croire la rumeur si elle a plus de 10 000 partages sur les réseaux",
+                    "Fermer les yeux et faire confiance au premier commentaire"
+                ],
+                answer: 0,
+                feedback: "Recouper l'information consiste à confronter plusieurs sources fiables et reconnues (médias d'information, sites officiels)."
+            },
+            {
+                q: "Si une vidéo montre un événement incroyable mais qu'aucun média d'information officiel n'en parle, que faut-il en déduire ?",
+                options: [
+                    "Il y a une forte probabilité qu'il s'agisse d'un canular, d'un trucage ou d'une fausse nouvelle",
+                    "C'est une information ultra-secrète et totalement vraie",
+                    "Les journalistes ne savent pas utiliser Internet",
+                    "Il faut la republier sur son profil en majuscules"
+                ],
+                answer: 0,
+                feedback: "L'absence de confirmation par des sources fiables doit immédiatement inciter à la plus grande prudence."
+            },
+
+            // Slide 14 : Les Bons Réflexes en Ligne (Nétiquette au Collège)
+            {
+                q: "Si un message reçu sur un forum ou un réseau te met en colère, quel est le bon réflexe à adopter ?",
+                options: [
+                    "Attendre, fermer l'écran pour se calmer et en parler à un adulte",
+                    "Répondre immédiatement en insultant l'expéditeur",
+                    "Casser son clavier de colère",
+                    "Envoyer 100 messages menaçants"
+                ],
+                answer: 0,
+                feedback: "Prendre du recul, éteindre temporairement l'écran et alerter un adulte empêche l'escalade de l'agressivité."
+            },
+            {
+                q: "Lorsque tu publies un travail scolaire réalisé en groupe, que dois-tu faire ?",
+                options: [
+                    "Mentionner les prénoms de tous les camarades ayant participé",
+                    "Mettre uniquement son propre prénom pour avoir la meilleure note",
+                    "Oublier volontairement les autres auteurs",
+                    "Publier le travail en anonyme sans aucun nom"
+                ],
+                answer: 0,
+                feedback: "La politesse et l'honnêteté intellectuelle imposent de valoriser l'ensemble des contributeurs du travail."
+            },
+            {
+                q: "Sur le forum du collège, quelle est la règle d'écriture et de politesse à respecter ?",
+                options: [
+                    "Mettre une formule de politesse (« Bonjour ») et écrire en minuscules normales",
+                    "ÉCRIRE TOUT EN MAJUSCULES POUR QU'ON NOUS ÉCOUTE",
+                    "Utiliser uniquement des emojis sans aucun mot",
+                    "Tutoyer le principal et les professeurs"
+                ],
+                answer: 0,
+                feedback: "Une salutation courtoise et une typographie sobre sont les bases du respect sur un espace scolaire."
+            },
+
+            // Slide 15 : Le Filtre de Sécurité : 4 Étapes Avant de Publier
+            {
+                q: "Combien d'étapes comporte « Le Filtre de Sécurité » avant de cliquer sur 'Publier' ?",
+                options: [
+                    "4 étapes (1. Réfléchir, 2. Protéger, 3. Vérifier, 4. Publier)",
+                    "2 étapes (Cliquer et Éteindre)",
+                    "6 étapes techniques",
+                    "1 seule étape rapide"
+                ],
+                answer: 0,
+                feedback: "Le protocole de validation suit 4 étapes séquentielles indispensables."
+            },
+            {
+                q: "Quelle question se pose-t-on lors de l'Étape 1 du filtre de sécurité (« RÉFLÉCHIR ») ?",
+                options: [
+                    "« Mon contenu est-il utile, vrai et poli ? »",
+                    "« Est-ce que cette publication va me rendre célèbre ? »",
+                    "« Combien d'argent vais-je gagner ? »",
+                    "« Quel filtre photo est le plus joli ? »"
+                ],
+                answer: 0,
+                feedback: "La première barrière morale : s'assurer que le contenu apporte une valeur positive, réelle et courtoise."
+            },
+            {
+                q: "Quelle vérification fait-on lors de l'Étape 2 du filtre (« PROTÉGER ») ?",
+                options: [
+                    "« Ai-je bien masqué mes données personnelles et préservé ma vie privée ? »",
+                    "« Mon mot de passe est-il écrit dans mon message ? »",
+                    "« Ai-je mis ma photo de classe en ligne ? »",
+                    "« Ai-je donné mon numéro de téléphone à tout le monde ? »"
+                ],
+                answer: 0,
+                feedback: "L'étape de protection garantit qu'aucun élément d'identité sensible n'est exposé publiquement."
+            },
+            {
+                q: "Quelle interrogation guide l'Étape 3 du filtre (« VÉRIFIER ») ?",
+                options: [
+                    "« Ai-je le droit de partager ces éléments (droit d'auteur, droit à l'image, accord des amis) ? »",
+                    "« Mon message est-il écrit en rouge fluo ? »",
+                    "« Combien d'heures ai-je passé sur mon ordinateur ? »",
+                    "« Mon navigateur web est-il à jour ? »"
+                ],
+                answer: 0,
+                feedback: "On vérifie la légalité du partage (droits d'auteur et autorisations préalables)."
+            },
+            {
+                q: "Que se passe-t-il lors de l'Étape 4 (« PUBLIER ») une fois les 3 premières étapes validées ?",
+                options: [
+                    "On peut valider et publier en toute confiance et en toute sécurité",
+                    "L'ordinateur supprime automatiquement le document",
+                    "Il faut tout recommencer depuis le début",
+                    "Le message est envoyé à la police du web"
+                ],
+                answer: 0,
+                feedback: "Une fois les 3 verrous passés avec succès, la publication peut être effectuée en pleine sérénité."
+            },
+
+            // Questions d'ancrage et de synthèse (Permis Web)
+            {
+                q: "Un élève trouve un texte bien rédigé sur un blog et le colle mot pour mot dans son exposé sans citer le nom de l'auteur. De quoi s'agit-il ?",
+                options: [
+                    "D'un plagiat (interdit par la loi et les règles scolaires)",
+                    "D'une utilisation légale sous licence libre",
+                    "D'un travail de recherche exemplaire",
+                    "D'une simple correction orthographique"
+                ],
+                answer: 0,
+                feedback: "Reprendre le texte d'un autre sans attribution constitue un plagiat direct."
+            },
+            {
+                q: "Vous prenez une photo drôle de votre camarade pendant la récréation. Que devez-vous faire avant de l'envoyer sur un réseau social ?",
+                options: [
+                    "Lui demander impérativement son accord pour respecter son droit à l'image",
+                    "La poster immédiatement sans rien lui dire",
+                    "L'envoyer anonymement à tous les élèves du collège",
+                    "Flouter l'arrière-plan uniquement"
+                ],
+                answer: 0,
+                feedback: "Le droit à l'image impose le consentement préalable de la personne photographiée avant toute diffusion."
+            },
+            {
+                q: "En conclusion de cette mission, quel titre valide vos compétences de publication responsable ?",
+                options: [
+                    "Le Permis Web et la Certification PIX du Citoyen Numérique",
+                    "Le Diplôme de Joueur Professionnel",
+                    "La Licence de Programmation Avancée",
+                    "Le Certificat de Vente en Ligne"
+                ],
+                answer: 0,
+                feedback: "La réussite de ce parcours valide les compétences numériques fondamentales du cadre PIX et du Permis Web."
+            }
+        ];
+
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        const questionText = document.getElementById('question-text');
+        const questionIndexLabel = document.getElementById('question-index-label');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const liveScore = document.getElementById('live-score');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDesc = document.getElementById('feedback-desc');
+        const nextBtn = document.getElementById('next-btn');
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(rawQuestions).map(q => {
+                const mappedOptions = q.options.map((optText, originalIndex) => ({
+                    text: optText,
+                    isCorrect: originalIndex === q.answer
+                }));
+                return {
+                    q: q.q,
+                    options: shuffleArray(mappedOptions),
+                    feedback: q.feedback
+                };
+            });
+
+            currentIndex = 0;
+            score = 0;
+            isAnswered = false;
+
+            quizView.style.display = 'block';
+            resultsView.style.display = 'none';
+            liveScore.innerText = `Score : 0 / ${questions.length}`;
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            isAnswered = false;
+            nextBtn.disabled = true;
+            feedbackBox.style.display = 'none';
+
+            const total = questions.length;
+            const currentNum = currentIndex + 1;
+            const qData = questions[currentIndex];
+
+            progressText.innerText = `Question ${currentNum} sur ${total}`;
+            questionIndexLabel.innerText = `Question ${currentNum} / ${total}`;
+            progressBar.style.width = `${(currentNum / total) * 100}%`;
+
+            questionText.innerText = qData.q;
+
+            optionsContainer.innerHTML = '';
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-button';
+                btn.innerText = opt.text;
+                btn.onclick = () => handleSelectOption(idx, opt.isCorrect);
+                optionsContainer.appendChild(btn);
+            });
+
+            if (currentIndex === total - 1) {
+                nextBtn.innerText = "Consulter le Bilan PIX ➔";
+            } else {
+                nextBtn.innerText = "Question suivante ➔";
+            }
+        }
+
+        function handleSelectOption(selectedIdx, isCorrect) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const buttons = optionsContainer.querySelectorAll('.option-button');
+            const qData = questions[currentIndex];
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (qData.options[idx].isCorrect) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIdx) {
+                    btn.classList.add('wrong');
+                } else {
+                    btn.classList.add('dimmed');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                feedbackBox.className = 'feedback-container correct';
+                feedbackTitle.innerText = "✓ Bonne réponse !";
+            } else {
+                feedbackBox.className = 'feedback-container wrong';
+                feedbackTitle.innerText = "✕ Mauvaise réponse !";
+            }
+
+            liveScore.innerText = `Score : ${score} / ${questions.length}`;
+            feedbackDesc.innerText = qData.feedback;
+            feedbackBox.style.display = 'block';
+
+            nextBtn.disabled = false;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quizView.style.display = 'none';
+            resultsView.style.display = 'block';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+
+            document.getElementById('final-percent').innerText = `${percent}%`;
+            document.getElementById('stat-correct-count').innerText = score;
+            document.getElementById('stat-wrong-count').innerText = total - score;
+
+            const titleEl = document.getElementById('result-title-text');
+            const descEl = document.getElementById('result-desc-text');
+
+            if (percent >= 90) {
+                titleEl.innerText = "🏆 Permis Web Validé avec Mention Très Bien !";
+                descEl.innerText = "Félicitations ! Tu maîtrises parfaitement l'encre indélébile du Web, les espaces privés/publics, le droit d'auteur, l'empreinte numérique, le filtre de sécurité et la détection du clickbait. Tu es un citoyen numérique modèle pour PIX !";
+            } else if (percent >= 75) {
+                titleEl.innerText = "⭐ Permis Web Validé !";
+                descEl.innerText = "Très bon score ! Tu as acquis d'excellents réflexes pour publier, protéger ta vie privée et respecter les créations d'autrui sur Internet.";
+            } else if (percent >= 50) {
+                titleEl.innerText = "🔍 Apprenti Publicateur";
+                descEl.innerText = "Des bases acquises, mais reste vigilant face aux pièges du Web : révise bien les 3 règles du partage, le droit à l'image et les 4 étapes du filtre de sécurité avant de publier.";
+            } else {
+                titleEl.innerText = "⚠️ Formation à Approfondir";
+                descEl.innerText = "Attention aux traces que tu laisses en ligne ! Revois attentivement la règle de l'encre indélébile, la différence privé/public et la lutte contre le plagiat, puis retente l'évaluation.";
+            }
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
